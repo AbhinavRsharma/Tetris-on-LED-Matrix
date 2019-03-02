@@ -1,0 +1,909 @@
+int ds=11;
+int st=12;
+int sh=13;
+int gnd[8]={8,9,2,3,4,5,6,7};
+int push[4]={A0,A1,A2,A3};
+int highest_mat=0,y_top,y_bot,x_lef,x_rig;
+int left_p=0,right_p=0,down_p=0,rotate_p=0;
+int matrix_top=7,score=0;
+boolean matrix_b[8][8]={
+  {0,0,0,0,0,0,0,0}, 
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},  
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},  
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0}};
+
+boolean matrix_r[8][8]={
+  {0,0,0,0,0,0,0,0}, 
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},  
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},  
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0}};
+
+  boolean block_b[8][8]={
+  {0,0,0,0,0,0,0,0}, 
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},  
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},  
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0}};
+
+  boolean block_r[8][8]={
+  {0,0,0,0,0,0,0,0}, 
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},  
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},  
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0}};
+
+void setup()
+{
+  Serial.begin(9600);
+  randomSeed(analogRead(A5));
+  pinMode(ds, OUTPUT);
+  pinMode(st, OUTPUT);
+  pinMode(sh, OUTPUT);
+  pinMode(gnd[0],OUTPUT);
+  pinMode(gnd[1],OUTPUT);
+  pinMode(gnd[2],OUTPUT);
+  pinMode(gnd[3],OUTPUT);
+  pinMode(gnd[4],OUTPUT);
+  pinMode(gnd[5],OUTPUT);
+  pinMode(gnd[6],OUTPUT);
+  pinMode(gnd[7],OUTPUT);
+  pinMode(push[0],INPUT);
+  pinMode(push[1],INPUT);
+  pinMode(push[2],INPUT);
+  pinMode(push[3],INPUT);
+}
+void ins_down(){
+  while(1){
+    if(down()==0)return;
+  }
+}
+void rotate(){
+  for(int i=0;i<8;i++){
+    //for(int j=0;j<8;j++)
+  }
+}
+void new_block(){
+  int rand_b=random(7);
+  for(int i=0;i<8;i++){
+    for(int j=0;j<8;j++){block_r[i][j]=0;block_b[i][j]=0;}
+  }
+  switch(rand_b){
+   case 0:
+    block_b[0][2]=1;block_b[0][3]=1;block_b[0][4]=1;block_b[1][3]=1;
+    y_top=0;y_bot=1;x_lef=2;x_rig=4;
+    break;
+   case 1:
+    block_r[0][3]=1;block_r[0][4]=1;block_r[1][4]=1;block_r[1][3]=1;
+    y_top=0;y_bot=1;x_lef=3;x_rig=4;
+    break;
+   case 2:
+    block_b[0][2]=1;block_b[0][3]=1;block_b[0][4]=1;block_b[1][4]=1;
+    y_top=0;y_bot=1;x_lef=2;x_rig=4;
+    break;
+   case 3:
+    block_r[0][2]=1;block_r[0][3]=1;block_r[0][4]=1;block_r[1][2]=1;
+    y_top=0;y_bot=1;x_lef=2;x_rig=4;
+    break;
+   case 4:
+    block_b[0][3]=1;block_b[1][3]=1;block_b[1][4]=1;block_b[2][4]=1;
+    y_top=0;y_bot=2;x_lef=3;x_rig=4;
+    break;
+   case 5:
+    block_r[0][4]=1;block_r[1][3]=1;block_r[1][4]=1;block_r[2][3]=1;
+    y_top=0;y_bot=2;x_lef=3;x_rig=4;
+    break;
+   case 6:
+    block_b[0][3]=1;block_b[1][3]=1;block_b[2][3]=1;block_b[3][3]=1;
+    y_top=0;y_bot=3;x_lef=3;x_rig=3;
+    break;
+  }
+}
+void display(){
+    int t=0;
+for(int o=0;o<32;o++){
+    if(digitalRead(push[0])==HIGH){left_p=1;right_p=0;down_p=0;rotate_p=0;}
+ 	else if(digitalRead(push[1])==HIGH){right_p=1;left_p=0;down_p=0;rotate_p=0;}
+    else if(digitalRead(push[2])==HIGH){down_p=1;right_p=0;left_p=0;rotate_p=0;}
+    else if(digitalRead(push[3])==HIGH){rotate_p=1;right_p=0;left_p=0;down_p=0;}
+ //delay(1);
+    if(t==0)digitalWrite(gnd[7],HIGH);
+    else digitalWrite(gnd[t-1],HIGH);
+ 
+ for(int i=0;i<8;i++){
+     digitalWrite(sh,LOW);
+     digitalWrite(st,LOW);
+       digitalWrite(ds,matrix_b[t][i]||block_b[t][i]);
+     digitalWrite(st,HIGH);
+     digitalWrite(sh,HIGH);
+    
+     digitalWrite(sh,LOW);
+     digitalWrite(st,LOW);
+       digitalWrite(ds,matrix_r[t][i]||block_r[t][i]);
+     digitalWrite(st,HIGH);
+     digitalWrite(sh,HIGH);
+    
+     digitalWrite(sh,LOW);
+     digitalWrite(st,LOW);
+       digitalWrite(ds,LOW);//green ;ll b low
+     digitalWrite(st,HIGH);
+     digitalWrite(sh,HIGH);
+     }
+    if(t==0)digitalWrite(gnd[0],LOW);
+    else digitalWrite(gnd[t],LOW);
+     
+    if(t==7)t=0;
+    else t++;    
+ 	delay(1);
+}
+}
+void check_inputs(){
+    if(left_p)left();
+    else if(right_p)right();
+    else if(down_p)ins_down();
+    else if(rotate_p)rotate();
+}
+int down(){// corrected
+    if(y_bot==7)return 0;
+    
+  	for(int k=y_bot;k>=y_top;k--){
+      for(int l=x_lef;l<=x_rig;l++){
+        if(block_b[k][l]==1) 
+          if(matrix_b[k+1][l]==1||matrix_r[k+1][l]==1)return 0;
+        if(block_r[k][l]==1) 
+          if(matrix_b[k+1][l]==1||matrix_r[k+1][l]==1)return 0;
+      }
+    }
+    for(int k=y_bot;k>=y_top;k--){
+      for(int l=x_lef;l<=x_rig;l++){
+        if(block_b[k][l]==1){ 
+              	block_b[k+1][l]=1;
+        		block_b[k][l]=0;
+        }
+        if(block_r[k][l]==1){ 
+              	block_r[k+1][l]=1;
+        		block_r[k][l]=0;
+        }
+      }
+    }
+    y_top++;y_bot++;
+}
+void add_block(){
+    for(int i=0;i<8;i++){
+        for(int j=0;j<8;j++){
+            matrix_b[i][j]=matrix_b[i][j]||block_b[i][j];
+            matrix_r[i][j]=matrix_r[i][j]||block_r[i][j];
+        }
+    }
+}
+void remove_line(){
+  for(int i=y_bot;i>=y_top;i--){
+    int row_same=1;
+    for(int j=1;j<8;j++){
+       if(matrix_b[i][j]!=matrix_b[i][j-1]){row_same=0;break;}
+       if(matrix_r[i][j]!=matrix_r[i][j-1]){row_same=0;break;}
+    }
+    if(row_same){
+      score++;
+      for(int i1=i;i1>matrix_top;i1--){
+        for(int j1=0;j1<8;j1++){
+          matrix_b[i1][j1]=matrix_b[i1-1][j1];
+          matrix_r[i1][j1]=matrix_r[i1-1][j1];
+        }
+      }
+      /*for(int j1=0;j1<8;j1++){
+          matrix_b[matrix_top][j1]=0;
+          matrix_r[matrix_top][j1]=0;
+        }*/
+      matrix_top--;y_top--;
+      i++;
+    }
+  }
+}// not checked
+int left(){
+  if(x_lef==0)return 0;
+  for(int i=y_top;i<=y_bot;i++){
+      for(int j=x_lef;j<=x_rig;j++){
+        if(block_b[i][j]==1){ 
+           if(matrix_b[i][j-1]==1||matrix_r[i][j-1]==1)return 0;
+        }
+        if(block_r[i][j]==1){ 
+           if(matrix_b[i][j-1]==1||matrix_r[i][j-1]==1)return 0;
+        }
+      }
+    }
+   for(int i=y_top;i<=y_bot;i++){
+      for(int j=x_lef;j<=x_rig;j++){
+        if(block_b[i][j]==1){ 
+              	block_b[i][j-1]=1;
+        		block_b[i][j]=0;
+        }
+        if(block_r[i][j]==1){
+              	block_r[i][j-1]=1;
+        		block_r[i][j]=0;
+        }
+      }
+    }
+   x_lef--;x_rig--;
+}
+      
+int right(){
+  if(x_rig==7)return 0;
+  for(int i=y_top;i<=y_bot;i++){
+      for(int j=x_lef;j<=x_rig;j++){
+        if(block_b[i][j]==1){ 
+           if(matrix_b[i][j+1]==1||matrix_r[i][j+1]==1)return 0;
+        }
+        if(block_r[i][j]==1){ 
+           if(matrix_b[i][j+1]==1||matrix_r[i][j+1]==1)return 0;
+        }
+      }
+    }
+   for(int i=y_top;i<=y_bot;i++){
+      for(int j=x_rig;j>=x_lef;j--){
+        if(block_b[i][j]==1){ 
+              	block_b[i][j+1]=1;
+        		block_b[i][j]=0;
+        }
+        if(block_r[i][j]==1){
+              	block_r[i][j+1]=1;
+        		block_r[i][j]=0;
+        }
+      }
+    }
+   x_lef++;x_rig++;
+}
+void end_game(){
+  for(int i=0;i<8;i++){
+    for(int j=0;j<8;j++){
+       matrix_b[i][j]=1;matrix_r[i][j]=1;
+       block_b[i][j]=1;block_r[i][j]=1;
+    }
+  }
+  while(1){
+     display();
+  }
+}
+int t=0;
+void loop(){
+    Serial.print(matrix_top); 
+         Serial.print("\t\t");
+          if(matrix_top==0)end_game();
+new_block();
+  for(int i=0;i<8;i++)digitalWrite(gnd[i],HIGH);
+  //for loop for one frame
+  while(1){
+    display();
+    check_inputs();
+    if(down()==0){
+        
+        if(y_top<matrix_top)matrix_top=y_top;
+      
+        add_block();
+      	remove_line();
+        break;
+    }
+  }
+  //chk for inputs
+  
+  delay(200);
+} 
+int ds=11;
+int st=12;
+int sh=13;
+int gnd[8]={8,9,2,3,4,5,6,7};
+int push[4]={A0,A1,A2,A3};
+int highest_mat=0,y_top,y_bot,x_lef,x_rig;
+int left_p=0,right_p=0,down_p=0,rotate_p=0;
+int matrix_top=7,score=0;
+boolean matrix_b[8][8]={
+  {0,0,0,0,0,0,0,0}, 
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},  
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},  
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0}};
+
+boolean matrix_r[8][8]={
+  {0,0,0,0,0,0,0,0}, 
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},  
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},  
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0}};
+
+  boolean block_b[8][8]={
+  {0,0,0,0,0,0,0,0}, 
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},  
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},  
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0}};
+
+  boolean block_r[8][8]={
+  {0,0,0,0,0,0,0,0}, 
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},  
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},  
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0}};
+
+void setup()
+{
+  Serial.begin(9600);
+  randomSeed(analogRead(A5));
+  pinMode(ds, OUTPUT);
+  pinMode(st, OUTPUT);
+  pinMode(sh, OUTPUT);
+  pinMode(gnd[0],OUTPUT);
+  pinMode(gnd[1],OUTPUT);
+  pinMode(gnd[2],OUTPUT);
+  pinMode(gnd[3],OUTPUT);
+  pinMode(gnd[4],OUTPUT);
+  pinMode(gnd[5],OUTPUT);
+  pinMode(gnd[6],OUTPUT);
+  pinMode(gnd[7],OUTPUT);
+  pinMode(push[0],INPUT);
+  pinMode(push[1],INPUT);
+  pinMode(push[2],INPUT);
+  pinMode(push[3],INPUT);
+}
+void ins_down(){
+  while(1){
+    if(down()==0)return;
+  }
+}
+void rotate(){
+  for(int i=0;i<8;i++){
+    //for(int j=0;j<8;j++)
+  }
+}
+void new_block(){
+  int rand_b=random(7);
+  for(int i=0;i<8;i++){
+    for(int j=0;j<8;j++){block_r[i][j]=0;block_b[i][j]=0;}
+  }
+  switch(rand_b){
+   case 0:
+    block_b[0][2]=1;block_b[0][3]=1;block_b[0][4]=1;block_b[1][3]=1;
+    y_top=0;y_bot=1;x_lef=2;x_rig=4;
+    break;
+   case 1:
+    block_r[0][3]=1;block_r[0][4]=1;block_r[1][4]=1;block_r[1][3]=1;
+    y_top=0;y_bot=1;x_lef=3;x_rig=4;
+    break;
+   case 2:
+    block_b[0][2]=1;block_b[0][3]=1;block_b[0][4]=1;block_b[1][4]=1;
+    y_top=0;y_bot=1;x_lef=2;x_rig=4;
+    break;
+   case 3:
+    block_r[0][2]=1;block_r[0][3]=1;block_r[0][4]=1;block_r[1][2]=1;
+    y_top=0;y_bot=1;x_lef=2;x_rig=4;
+    break;
+   case 4:
+    block_b[0][3]=1;block_b[1][3]=1;block_b[1][4]=1;block_b[2][4]=1;
+    y_top=0;y_bot=2;x_lef=3;x_rig=4;
+    break;
+   case 5:
+    block_r[0][4]=1;block_r[1][3]=1;block_r[1][4]=1;block_r[2][3]=1;
+    y_top=0;y_bot=2;x_lef=3;x_rig=4;
+    break;
+   case 6:
+    block_b[0][3]=1;block_b[1][3]=1;block_b[2][3]=1;block_b[3][3]=1;
+    y_top=0;y_bot=3;x_lef=3;x_rig=3;
+    break;
+  }
+}
+void display(){
+    int t=0;
+for(int o=0;o<32;o++){
+    if(digitalRead(push[0])==HIGH){left_p=1;right_p=0;down_p=0;rotate_p=0;}
+ 	else if(digitalRead(push[1])==HIGH){right_p=1;left_p=0;down_p=0;rotate_p=0;}
+    else if(digitalRead(push[2])==HIGH){down_p=1;right_p=0;left_p=0;rotate_p=0;}
+    else if(digitalRead(push[3])==HIGH){rotate_p=1;right_p=0;left_p=0;down_p=0;}
+ //delay(1);
+    if(t==0)digitalWrite(gnd[7],HIGH);
+    else digitalWrite(gnd[t-1],HIGH);
+ 
+ for(int i=0;i<8;i++){
+     digitalWrite(sh,LOW);
+     digitalWrite(st,LOW);
+       digitalWrite(ds,matrix_b[t][i]||block_b[t][i]);
+     digitalWrite(st,HIGH);
+     digitalWrite(sh,HIGH);
+    
+     digitalWrite(sh,LOW);
+     digitalWrite(st,LOW);
+       digitalWrite(ds,matrix_r[t][i]||block_r[t][i]);
+     digitalWrite(st,HIGH);
+     digitalWrite(sh,HIGH);
+    
+     digitalWrite(sh,LOW);
+     digitalWrite(st,LOW);
+       digitalWrite(ds,LOW);//green ;ll b low
+     digitalWrite(st,HIGH);
+     digitalWrite(sh,HIGH);
+     }
+    if(t==0)digitalWrite(gnd[0],LOW);
+    else digitalWrite(gnd[t],LOW);
+     
+    if(t==7)t=0;
+    else t++;    
+ 	delay(1);
+}
+}
+void check_inputs(){
+    if(left_p)left();
+    else if(right_p)right();
+    else if(down_p)ins_down();
+    else if(rotate_p)rotate();
+}
+int down(){// corrected
+    if(y_bot==7)return 0;
+    
+  	for(int k=y_bot;k>=y_top;k--){
+      for(int l=x_lef;l<=x_rig;l++){
+        if(block_b[k][l]==1) 
+          if(matrix_b[k+1][l]==1||matrix_r[k+1][l]==1)return 0;
+        if(block_r[k][l]==1) 
+          if(matrix_b[k+1][l]==1||matrix_r[k+1][l]==1)return 0;
+      }
+    }
+    for(int k=y_bot;k>=y_top;k--){
+      for(int l=x_lef;l<=x_rig;l++){
+        if(block_b[k][l]==1){ 
+              	block_b[k+1][l]=1;
+        		block_b[k][l]=0;
+        }
+        if(block_r[k][l]==1){ 
+              	block_r[k+1][l]=1;
+        		block_r[k][l]=0;
+        }
+      }
+    }
+    y_top++;y_bot++;
+}
+void add_block(){
+    for(int i=0;i<8;i++){
+        for(int j=0;j<8;j++){
+            matrix_b[i][j]=matrix_b[i][j]||block_b[i][j];
+            matrix_r[i][j]=matrix_r[i][j]||block_r[i][j];
+        }
+    }
+}
+void remove_line(){
+  for(int i=y_bot;i>=y_top;i--){
+    int row_same=1;
+    for(int j=1;j<8;j++){
+       if(matrix_b[i][j]!=matrix_b[i][j-1]){row_same=0;break;}
+       if(matrix_r[i][j]!=matrix_r[i][j-1]){row_same=0;break;}
+    }
+    if(row_same){
+      score++;
+      for(int i1=i;i1>matrix_top;i1--){
+        for(int j1=0;j1<8;j1++){
+          matrix_b[i1][j1]=matrix_b[i1-1][j1];
+          matrix_r[i1][j1]=matrix_r[i1-1][j1];
+        }
+      }
+      /*for(int j1=0;j1<8;j1++){
+          matrix_b[matrix_top][j1]=0;
+          matrix_r[matrix_top][j1]=0;
+        }*/
+      matrix_top--;y_top--;
+      i++;
+    }
+  }
+}// not checked
+int left(){
+  if(x_lef==0)return 0;
+  for(int i=y_top;i<=y_bot;i++){
+      for(int j=x_lef;j<=x_rig;j++){
+        if(block_b[i][j]==1){ 
+           if(matrix_b[i][j-1]==1||matrix_r[i][j-1]==1)return 0;
+        }
+        if(block_r[i][j]==1){ 
+           if(matrix_b[i][j-1]==1||matrix_r[i][j-1]==1)return 0;
+        }
+      }
+    }
+   for(int i=y_top;i<=y_bot;i++){
+      for(int j=x_lef;j<=x_rig;j++){
+        if(block_b[i][j]==1){ 
+              	block_b[i][j-1]=1;
+        		block_b[i][j]=0;
+        }
+        if(block_r[i][j]==1){
+              	block_r[i][j-1]=1;
+        		block_r[i][j]=0;
+        }
+      }
+    }
+   x_lef--;x_rig--;
+}
+      
+int right(){
+  if(x_rig==7)return 0;
+  for(int i=y_top;i<=y_bot;i++){
+      for(int j=x_lef;j<=x_rig;j++){
+        if(block_b[i][j]==1){ 
+           if(matrix_b[i][j+1]==1||matrix_r[i][j+1]==1)return 0;
+        }
+        if(block_r[i][j]==1){ 
+           if(matrix_b[i][j+1]==1||matrix_r[i][j+1]==1)return 0;
+        }
+      }
+    }
+   for(int i=y_top;i<=y_bot;i++){
+      for(int j=x_rig;j>=x_lef;j--){
+        if(block_b[i][j]==1){ 
+              	block_b[i][j+1]=1;
+        		block_b[i][j]=0;
+        }
+        if(block_r[i][j]==1){
+              	block_r[i][j+1]=1;
+        		block_r[i][j]=0;
+        }
+      }
+    }
+   x_lef++;x_rig++;
+}
+void end_game(){
+  for(int i=0;i<8;i++){
+    for(int j=0;j<8;j++){
+       matrix_b[i][j]=1;matrix_r[i][j]=1;
+       block_b[i][j]=1;block_r[i][j]=1;
+    }
+  }
+  while(1){
+     display();
+  }
+}
+int t=0;
+void loop(){
+    Serial.print(matrix_top); 
+         Serial.print("\t\t");
+          if(matrix_top==0)end_game();
+new_block();
+  for(int i=0;i<8;i++)digitalWrite(gnd[i],HIGH);
+  //for loop for one frame
+  while(1){
+    display();
+    check_inputs();
+    if(down()==0){
+        
+        if(y_top<matrix_top)matrix_top=y_top;
+      
+        add_block();
+      	remove_line();
+        break;
+    }
+  }
+  //chk for inputs
+  
+  delay(200);
+} 
+int ds=11;
+int st=12;
+int sh=13;
+int gnd[8]={8,9,2,3,4,5,6,7};
+int push[4]={A0,A1,A2,A3};
+int highest_mat=0,y_top,y_bot,x_lef,x_rig;
+int left_p=0,right_p=0,down_p=0,rotate_p=0;
+int matrix_top=7,score=0;
+boolean matrix_b[8][8]={
+  {0,0,0,0,0,0,0,0}, 
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},  
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},  
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0}};
+
+boolean matrix_r[8][8]={
+  {0,0,0,0,0,0,0,0}, 
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},  
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},  
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0}};
+
+  boolean block_b[8][8]={
+  {0,0,0,0,0,0,0,0}, 
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},  
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},  
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0}};
+
+  boolean block_r[8][8]={
+  {0,0,0,0,0,0,0,0}, 
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},  
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},  
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0,0}};
+
+void setup()
+{
+  Serial.begin(9600);
+  randomSeed(analogRead(A5));
+  pinMode(ds, OUTPUT);
+  pinMode(st, OUTPUT);
+  pinMode(sh, OUTPUT);
+  pinMode(gnd[0],OUTPUT);
+  pinMode(gnd[1],OUTPUT);
+  pinMode(gnd[2],OUTPUT);
+  pinMode(gnd[3],OUTPUT);
+  pinMode(gnd[4],OUTPUT);
+  pinMode(gnd[5],OUTPUT);
+  pinMode(gnd[6],OUTPUT);
+  pinMode(gnd[7],OUTPUT);
+  pinMode(push[0],INPUT);
+  pinMode(push[1],INPUT);
+  pinMode(push[2],INPUT);
+  pinMode(push[3],INPUT);
+}
+void ins_down(){
+  while(1){
+    if(down()==0)return;
+  }
+}
+void rotate(){
+  for(int i=0;i<8;i++){
+    //for(int j=0;j<8;j++)
+  }
+}
+void new_block(){
+  int rand_b=random(7);
+  for(int i=0;i<8;i++){
+    for(int j=0;j<8;j++){block_r[i][j]=0;block_b[i][j]=0;}
+  }
+  switch(rand_b){
+   case 0:
+    block_b[0][2]=1;block_b[0][3]=1;block_b[0][4]=1;block_b[1][3]=1;
+    y_top=0;y_bot=1;x_lef=2;x_rig=4;
+    break;
+   case 1:
+    block_r[0][3]=1;block_r[0][4]=1;block_r[1][4]=1;block_r[1][3]=1;
+    y_top=0;y_bot=1;x_lef=3;x_rig=4;
+    break;
+   case 2:
+    block_b[0][2]=1;block_b[0][3]=1;block_b[0][4]=1;block_b[1][4]=1;
+    y_top=0;y_bot=1;x_lef=2;x_rig=4;
+    break;
+   case 3:
+    block_r[0][2]=1;block_r[0][3]=1;block_r[0][4]=1;block_r[1][2]=1;
+    y_top=0;y_bot=1;x_lef=2;x_rig=4;
+    break;
+   case 4:
+    block_b[0][3]=1;block_b[1][3]=1;block_b[1][4]=1;block_b[2][4]=1;
+    y_top=0;y_bot=2;x_lef=3;x_rig=4;
+    break;
+   case 5:
+    block_r[0][4]=1;block_r[1][3]=1;block_r[1][4]=1;block_r[2][3]=1;
+    y_top=0;y_bot=2;x_lef=3;x_rig=4;
+    break;
+   case 6:
+    block_b[0][3]=1;block_b[1][3]=1;block_b[2][3]=1;block_b[3][3]=1;
+    y_top=0;y_bot=3;x_lef=3;x_rig=3;
+    break;
+  }
+}
+void display(){
+    int t=0;
+for(int o=0;o<32;o++){
+    if(digitalRead(push[0])==HIGH){left_p=1;right_p=0;down_p=0;rotate_p=0;}
+ 	else if(digitalRead(push[1])==HIGH){right_p=1;left_p=0;down_p=0;rotate_p=0;}
+    else if(digitalRead(push[2])==HIGH){down_p=1;right_p=0;left_p=0;rotate_p=0;}
+    else if(digitalRead(push[3])==HIGH){rotate_p=1;right_p=0;left_p=0;down_p=0;}
+ //delay(1);
+    if(t==0)digitalWrite(gnd[7],HIGH);
+    else digitalWrite(gnd[t-1],HIGH);
+ 
+ for(int i=0;i<8;i++){
+     digitalWrite(sh,LOW);
+     digitalWrite(st,LOW);
+       digitalWrite(ds,matrix_b[t][i]||block_b[t][i]);
+     digitalWrite(st,HIGH);
+     digitalWrite(sh,HIGH);
+    
+     digitalWrite(sh,LOW);
+     digitalWrite(st,LOW);
+       digitalWrite(ds,matrix_r[t][i]||block_r[t][i]);
+     digitalWrite(st,HIGH);
+     digitalWrite(sh,HIGH);
+    
+     digitalWrite(sh,LOW);
+     digitalWrite(st,LOW);
+       digitalWrite(ds,LOW);//green ;ll b low
+     digitalWrite(st,HIGH);
+     digitalWrite(sh,HIGH);
+     }
+    if(t==0)digitalWrite(gnd[0],LOW);
+    else digitalWrite(gnd[t],LOW);
+     
+    if(t==7)t=0;
+    else t++;    
+ 	delay(1);
+}
+}
+void check_inputs(){
+    if(left_p)left();
+    else if(right_p)right();
+    else if(down_p)ins_down();
+    else if(rotate_p)rotate();
+}
+int down(){// corrected
+    if(y_bot==7)return 0;
+    
+  	for(int k=y_bot;k>=y_top;k--){
+      for(int l=x_lef;l<=x_rig;l++){
+        if(block_b[k][l]==1) 
+          if(matrix_b[k+1][l]==1||matrix_r[k+1][l]==1)return 0;
+        if(block_r[k][l]==1) 
+          if(matrix_b[k+1][l]==1||matrix_r[k+1][l]==1)return 0;
+      }
+    }
+    for(int k=y_bot;k>=y_top;k--){
+      for(int l=x_lef;l<=x_rig;l++){
+        if(block_b[k][l]==1){ 
+              	block_b[k+1][l]=1;
+        		block_b[k][l]=0;
+        }
+        if(block_r[k][l]==1){ 
+              	block_r[k+1][l]=1;
+        		block_r[k][l]=0;
+        }
+      }
+    }
+    y_top++;y_bot++;
+}
+void add_block(){
+    for(int i=0;i<8;i++){
+        for(int j=0;j<8;j++){
+            matrix_b[i][j]=matrix_b[i][j]||block_b[i][j];
+            matrix_r[i][j]=matrix_r[i][j]||block_r[i][j];
+        }
+    }
+}
+void remove_line(){
+  for(int i=y_bot;i>=y_top;i--){
+    int row_same=1;
+    for(int j=1;j<8;j++){
+       if(matrix_b[i][j]!=matrix_b[i][j-1]){row_same=0;break;}
+       if(matrix_r[i][j]!=matrix_r[i][j-1]){row_same=0;break;}
+    }
+    if(row_same){
+      score++;
+      for(int i1=i;i1>matrix_top;i1--){
+        for(int j1=0;j1<8;j1++){
+          matrix_b[i1][j1]=matrix_b[i1-1][j1];
+          matrix_r[i1][j1]=matrix_r[i1-1][j1];
+        }
+      }
+      /*for(int j1=0;j1<8;j1++){
+          matrix_b[matrix_top][j1]=0;
+          matrix_r[matrix_top][j1]=0;
+        }*/
+      matrix_top--;y_top--;
+      i++;
+    }
+  }
+}// not checked
+int left(){
+  if(x_lef==0)return 0;
+  for(int i=y_top;i<=y_bot;i++){
+      for(int j=x_lef;j<=x_rig;j++){
+        if(block_b[i][j]==1){ 
+           if(matrix_b[i][j-1]==1||matrix_r[i][j-1]==1)return 0;
+        }
+        if(block_r[i][j]==1){ 
+           if(matrix_b[i][j-1]==1||matrix_r[i][j-1]==1)return 0;
+        }
+      }
+    }
+   for(int i=y_top;i<=y_bot;i++){
+      for(int j=x_lef;j<=x_rig;j++){
+        if(block_b[i][j]==1){ 
+              	block_b[i][j-1]=1;
+        		block_b[i][j]=0;
+        }
+        if(block_r[i][j]==1){
+              	block_r[i][j-1]=1;
+        		block_r[i][j]=0;
+        }
+      }
+    }
+   x_lef--;x_rig--;
+}
+      
+int right(){
+  if(x_rig==7)return 0;
+  for(int i=y_top;i<=y_bot;i++){
+      for(int j=x_lef;j<=x_rig;j++){
+        if(block_b[i][j]==1){ 
+           if(matrix_b[i][j+1]==1||matrix_r[i][j+1]==1)return 0;
+        }
+        if(block_r[i][j]==1){ 
+           if(matrix_b[i][j+1]==1||matrix_r[i][j+1]==1)return 0;
+        }
+      }
+    }
+   for(int i=y_top;i<=y_bot;i++){
+      for(int j=x_rig;j>=x_lef;j--){
+        if(block_b[i][j]==1){ 
+              	block_b[i][j+1]=1;
+        		block_b[i][j]=0;
+        }
+        if(block_r[i][j]==1){
+              	block_r[i][j+1]=1;
+        		block_r[i][j]=0;
+        }
+      }
+    }
+   x_lef++;x_rig++;
+}
+void end_game(){
+  for(int i=0;i<8;i++){
+    for(int j=0;j<8;j++){
+       matrix_b[i][j]=1;matrix_r[i][j]=1;
+       block_b[i][j]=1;block_r[i][j]=1;
+    }
+  }
+  while(1){
+     display();
+  }
+}
+int t=0;
+void loop(){
+    Serial.print(matrix_top); 
+         Serial.print("\t\t");
+          if(matrix_top==0)end_game();
+new_block();
+  for(int i=0;i<8;i++)digitalWrite(gnd[i],HIGH);
+  //for loop for one frame
+  while(1){
+    display();
+    check_inputs();
+    if(down()==0){
+        
+        if(y_top<matrix_top)matrix_top=y_top;
+      
+        add_block();
+      	remove_line();
+        break;
+    }
+  }
+  //chk for inputs
+  
+  delay(200);
+} 
