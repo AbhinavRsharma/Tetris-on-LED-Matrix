@@ -6,6 +6,8 @@ int push[4]={A0,A1,A2,A3};
 int highest_mat=0,y_top,y_bot,x_lef,x_rig;
 int left_p=0,right_p=0,down_p=0,rotate_p=0;
 int matrix_top=7,score=0;
+
+int blocktype=0,blockrotation0=0;
 boolean matrix_b[8][8]={
   {0,0,0,0,0,0,0,0}, 
   {0,0,0,0,0,0,0,0},
@@ -49,7 +51,7 @@ boolean matrix_r[8][8]={
 void setup()
 {
   Serial.begin(9600);
-  randomSeed(analogRead(A5));
+  randomSeed(analogRead(A4));
   pinMode(ds, OUTPUT);
   pinMode(st, OUTPUT);
   pinMode(sh, OUTPUT);
@@ -72,12 +74,50 @@ void ins_down(){
   }
 }
 void rotate(){
-  for(int i=0;i<8;i++){
-    //for(int j=0;j<8;j++)
-  }
+  if(blocktype==0){
+      if(blockrotation0==0){ //T
+        if(y_top==0)return;
+        if(matrix_r[y_top-1][x_lef+1]||matrix_b[y_top-1][x_lef+1])
+          return;
+        block_b[y_top][x_lef]=0;
+        block_b[y_top-1][x_lef+1]=1;
+        blockrotation0=1;
+        x_lef++;y_top--;
+        return;
+      }else if(blockrotation0==1){
+        if(x_lef==0)return;
+        if(matrix_r[y_top+1][x_lef-1]||matrix_b[y_top+1][x_lef-1])
+        return;
+          block_b[y_bot][x_lef]=0;
+          block_b[y_top+1][x_lef-1]=1;
+          blockrotation0=2;
+          x_lef--;y_bot--;
+          return;
+      }else if(blockrotation0==2){
+        if(matrix_r[y_bot+1][x_lef+1]||matrix_b[y_bot+1][x_lef+1])
+        return;
+          block_b[y_bot][x_rig]=0;
+          block_b[y_bot+1][x_lef+1]=1;
+          blockrotation0=3;
+          x_rig--;y_bot++;
+          return;
+      }else
+      if(blockrotation0==3){
+        if(x_rig==7)return;
+        if(matrix_r[y_top+1][x_rig+1]||matrix_b[y_top+1][x_rig+1])
+        return;
+          block_b[y_top][x_rig]=0;
+          block_b[y_top+1][x_rig+1]=1;
+          blockrotation0=3;
+          x_rig++;y_top++;
+          return;
+      }
+
+    }
 }
 void new_block(){
   int rand_b=random(7);
+  //int rand_b=5;
   for(int i=0;i<8;i++){
     for(int j=0;j<8;j++){block_r[i][j]=0;block_b[i][j]=0;}
   }
@@ -149,6 +189,8 @@ for(int o=0;o<32;o++){
     else t++;    
  	delay(1);
 }
+  if(t==0)digitalWrite(gnd[7],HIGH);
+    else digitalWrite(gnd[t-1],HIGH);
 }
 void check_inputs(){
     if(left_p)left();
@@ -156,7 +198,7 @@ void check_inputs(){
     else if(down_p)ins_down();
     else if(rotate_p)rotate();
 }
-int down(){// corrected
+int down(){
     if(y_bot==7)return 0;
     
   	for(int k=y_bot;k>=y_top;k--){
@@ -204,15 +246,11 @@ void remove_line(){
           matrix_r[i1][j1]=matrix_r[i1-1][j1];
         }
       }
-      /*for(int j1=0;j1<8;j1++){
-          matrix_b[matrix_top][j1]=0;
-          matrix_r[matrix_top][j1]=0;
-        }*/
       matrix_top--;y_top--;
       i++;
     }
   }
-}// not checked
+}
 int left(){
   if(x_lef==0)return 0;
   for(int i=y_top;i<=y_bot;i++){
@@ -282,8 +320,10 @@ void loop(){
     Serial.print(matrix_top); 
          Serial.print("\t\t");
           if(matrix_top==0)end_game();
-new_block();
+  new_block();
+  blockrotation0=0;
   for(int i=0;i<8;i++)digitalWrite(gnd[i],HIGH);
+  
   //for loop for one frame
   while(1){
     display();
